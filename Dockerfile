@@ -1,4 +1,4 @@
-FROM registry.runpod.net/runpod-workers-worker-comfyui-main-dockerfile:d2a557235
+FROM runpod/worker-comfyui:latest
 
 RUN cd /comfyui/custom_nodes && \
     git clone https://github.com/cubiq/ComfyUI_InstantID.git && \

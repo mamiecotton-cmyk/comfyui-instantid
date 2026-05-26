@@ -5,14 +5,17 @@ RUN cd /comfyui/custom_nodes && \
     cd ComfyUI_InstantID && \
     pip install -r requirements.txt
 
-# Add startup script that runs before the worker
-RUN echo '#!/bin/bash\n\
+RUN printf '#!/bin/bash\n\
+echo "Waiting for volume mount..."\n\
+sleep 5\n\
 echo "Linking network volume models..."\n\
 for dir in checkpoints clip clip_vision configs controlnet embeddings instantid insightface loras upscale_models vae unet; do\n\
   if [ -d "/runpod-volume/models/$dir" ]; then\n\
     rm -rf /comfyui/models/$dir\n\
     ln -sf /runpod-volume/models/$dir /comfyui/models/$dir\n\
     echo "Linked $dir"\n\
+  else\n\
+    echo "Skipped $dir - not found"\n\
   fi\n\
 done\n\
 if [ -d "/runpod-volume/custom_nodes" ]; then\n\

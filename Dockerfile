@@ -7,6 +7,17 @@ RUN cd /comfyui/custom_nodes && \
     cd ComfyUI_InstantID && \
     pip install -r requirements.txt
 
+# --- PuLID-Flux (face lock for Flux generations) ---
+RUN cd /comfyui/custom_nodes && \
+    git clone https://github.com/lldacing/ComfyUI_PuLID_Flux_ll.git && \
+    cd ComfyUI_PuLID_Flux_ll && \
+    pip install -r requirements.txt && \
+    pip install facenet-pytorch --no-deps
+
+# Patch PuLID for ComfyUI's timestep_zero_index arg
+RUN sed -i 's/    attn_mask: Tensor = None,/    attn_mask: Tensor = None,\n    timestep_zero_index=None,/' \
+    /comfyui/custom_nodes/ComfyUI_PuLID_Flux_ll/PulidFluxHook.py || true
+
 RUN mkdir -p /comfyui/models/instantid && \
     wget -q --show-progress \
     --header="Authorization: Bearer ${HF_TOKEN}" \

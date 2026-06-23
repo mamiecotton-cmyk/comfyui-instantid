@@ -3,6 +3,7 @@ name: Build and Push Docker Image
 on:
   push:
     branches: [ main ]
+    tags: [ 'v*' ]
 
 jobs:
   build:
@@ -12,6 +13,15 @@ jobs:
       packages: write
     steps:
       - uses: actions/checkout@v3
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/mamiecotton-cmyk/comfyui-instantid
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=ref,event=tag
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
@@ -24,6 +34,6 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           push: true
-          tags: ghcr.io/mamiecotton-cmyk/comfyui-instantid:latest
+          tags: ${{ steps.meta.outputs.tags }}
           build-args: |
             HF_TOKEN=${{ secrets.HF_TOKEN }}

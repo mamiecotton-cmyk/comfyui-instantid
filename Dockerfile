@@ -24,17 +24,6 @@ RUN mkdir -p /comfyui/models/instantid && \
     -O /comfyui/models/instantid/ip-adapter.bin \
     "https://huggingface.co/InstantX/InstantID/resolve/main/ip-adapter.bin"
 
-# --- PuLID-Flux (face lock for Flux generations) ---
-RUN cd /comfyui/custom_nodes && \
-    git clone https://github.com/lldacing/ComfyUI_PuLID_Flux_ll.git && \
-    cd ComfyUI_PuLID_Flux_ll && \
-    pip install -r requirements.txt && \
-    pip install facenet-pytorch --no-deps
-
-# Patch PuLID for ComfyUI's timestep_zero_index arg (matches the test-pod fix)
-RUN sed -i 's/    attn_mask: Tensor = None,/    attn_mask: Tensor = None,\n    timestep_zero_index=None,/' \
-    /comfyui/custom_nodes/ComfyUI_PuLID_Flux_ll/PulidFluxHook.py || true
-
 RUN printf '#!/bin/bash\n\
 echo "Waiting for volume mount..."\n\
 sleep 3\n\
